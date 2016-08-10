@@ -2,7 +2,7 @@
 """
 Created on Wed Jul 27 09:06:55 2016
 
-@author: tpisano
+@author: tpisano, jnkh
 """
 import os, numpy as np, cv2, zipfile
 from skimage.external import tifffile #if this doesn't work import tifffile
@@ -62,11 +62,37 @@ def parser(pth, size = (228, 228)):
     cv2.fillPoly(mask, roilst, 1)
     
     #parse up im and mask
-    parsed_im = [xx for yy in np.array_split(im, im.shape[0] / size[0], axis = 0) for xx in np.array_split(yy, im.shape[0] / size[0], axis = 1)]
-    parsed_mask = [xx for yy in np.array_split(mask, mask.shape[0] / size[0], axis = 0) for xx in np.array_split(yy, mask.shape[0] / size[0], axis = 1)]
+    parsed_im = generate_blocks(im,size) 
+    parsed_mask = generate_blocks(mask,size)
     
     print('Completed parsing: {}'.format(pth[pth.rfind('/')+1:]))
     return parsed_im, parsed_mask
+
+
+
+def generate_blocks(arr,size):
+    tot_size_x = size[0] * (arr.shape[0] / size[0])
+    tot_size_y = size[1] * (arr.shape[1] / size[1])
+    arr = arr[:tot_size_x,:tot_size_y]
+    first_split = np.array_split(arr, arr.shape[0] / size[0], axis = 0)
+    ret = []
+    for s in first_split:
+        for x in np.array_split(s,s.shape[1] / size[1],axis=1):
+            ret.append(x)
+    return ret
+
+
+#### Author Julian Kates-Harbeck####
+
+def normalize_arr(arrs,new_shape):
+    max_val = max([np.max(a) for a in arrs])
+    for i in range(len(arrs)):
+        arrs[i] = arrs[i]*1.0/max_val
+        arrs[i] = np.reshape(arrs[i],new_shape)
+    return np.stack(arrs)
+
+def normalize(X,y,new_shape):
+    return normalize_arr(X,new_shape),normalize_arr(y,new_shape)
 
 
 
