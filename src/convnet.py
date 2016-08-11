@@ -4,9 +4,10 @@ Created on Wed Jul 27 09:06:55 2016
 
 @author: tpisano, jnkh
 """
+from __future__ import print_function
 import os, numpy as np, cv2, zipfile
 from skimage.external import tifffile #if this doesn't work import tifffile
-
+from itertools import chain
 #%%
 
 
@@ -27,6 +28,16 @@ if __name__ == '__main__':
     parsed_mask = [xxx for xx in im_zp_pair_lst for xxx in xx[1]]
     
 #%%
+
+def parse_dir(dir_path,size = (228,228)):
+    im_zp_pair_pths = [os.path.join(dir_path, dirs) for dirs in os.listdir(dir_path)]
+    print('Parsing directory {}'.format(dir_path))
+    images_and_zips =  [list(el) for el in zip(*[parser(path, size) for path in im_zp_pair_pths])]
+    ims = images_and_zips[0]
+    zips = images_and_zips[1]
+    return list(chain.from_iterable(ims)),list(chain.from_iterable(zips))
+
+
 
 def parser(pth, size = (228, 228)):
     '''Function to take image and ROI zip pairs made using ImageJ, generate two lists corresponding to im and masked image.

@@ -4,12 +4,13 @@ import matplotlib.pyplot as plt
 from build_model import build_model
 
 
-
+data_prepath = '/tigress/jk7/neurons/data/image_zip_pairs/'
 
 image_size = (228,228)
 full_image_size = (1,image_size[0],image_size[1])
-path = '../data/image_zip_pairs/l7cre_ts01_20150928_005na_z3um_3hfds_561_70msec_5ovlp_C00_Z0978/'
-X,y = c.parser(path,image_size)
+path = data_prepath + 'l7cre_ts01_20150928_005na_z3um_3hfds_561_70msec_5ovlp_C00_Z0978/'
+#X,y = c.parser(path,image_size)
+X,y = c.parse_dir(data_prepath,image_size)
 X,y = c.normalize(X,y,full_image_size)
 
 
